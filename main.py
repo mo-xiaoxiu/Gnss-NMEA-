@@ -1,21 +1,26 @@
 import os
 import re
-from datetime import datetime
+# from datetime import datetime
+import datetime
 import glob
 import pandas as pd  # 导入pandas库
 # import statelilteData_vis as sv
 import nmeaParse_single as nmeasingle
 from tkinter import *
 from tkinter import filedialog, messagebox
-import time
+# import time
 from tkcalendar import Calendar  # 用于日期选择控件
 import pyautogui
 import numpy as np
 
+import ttkbootstrap as ttk
+# from ttkbootstrap import Messagebox
+
 #打开输出文件以写入定位信息
 def format_time(timestamp):
     """将时间戳格式化为 YYYY-MM-DD_HH-MM 格式"""
-    return datetime.utcfromtimestamp(timestamp).strftime('%Y-%m-%d_%H-%M')
+    # return datetime.datetime.utcfromtimestamp(timestamp).strftime('%Y-%m-%d_%H-%M')
+    return datetime.datetime.fromtimestamp(timestamp, datetime.timezone.utc).strftime('%Y-%m-%d_%H-%M')
 
 def dms_to_decimal(degrees, direction):
     """将度分秒格式转换为十进制度格式"""
@@ -168,7 +173,7 @@ def parse_nmea_log(start_timestamp, end_timestamp, input_dir, output_dir, show_f
 
     # 保存卫星数据到Excel文件
     df_location = pd.DataFrame(location_data, columns=['Timestamp', 'Longitude', 'Latitude', 'Elevation'])
-    df_location.to_excel('locationd_2024-10-31_10-33.xlsx', index=False)
+    df_location.to_excel(location_excel, index=False)
 
     # df_satellites = pd.DataFrame(satellites_data)
     df_satellites = pd.DataFrame(satellites_data, columns=['Timestamp', 'PRN', 'Elevation', 'Azimuth', 'SNR'])
@@ -181,69 +186,177 @@ def parse_nmea_log(start_timestamp, end_timestamp, input_dir, output_dir, show_f
     # sv.stateliltes_data_vis(satellites_file, show_flag)
 
 
-# Tkinter GUI
+# # Tkinter GUI
+# class NMEAParserApp:
+#     def __init__(self, root):
+#         self.root = root
+#         self.root.title('NMEA Parser')
+#         self.root.geometry('1000x1000')
+#
+#         self.input_dir = None
+#         self.output_dir = None
+#
+#         # Tkinter GUI 日期时间选择
+#         self.start_data_label = Label(root, text='选择nmea日志分析的开始时间(YYYY-MM-DD HH:MM:SS)')
+#         self.start_data_label.pack(pady=5)
+#         self.start_data_entry = Entry(root) # 允许手动输入
+#         self.start_data_entry.pack(pady=5)
+#
+#         self.end_data_label = Label(root, text="选择nmea日志分析的结束时间(YYYY-MM-DD HH:MM:SS)")
+#         self.end_data_label.pack(pady=5)
+#         self.end_data_entry = Entry(root) # 允许手动输入
+#         self.end_data_entry.pack(pady=5)
+#
+#         # 文件路径选择按钮
+#         self.input_button = Button(root, text="选择nmea日志文件路径", command=self.select_input_path)
+#         self.input_button.pack(pady=10)
+#
+#         self.output_button = Button(root, text="选择分析结果输出路径", command=self.select_output_path)
+#         self.output_button.pack(pady=10)
+#
+#         self.output_button = Label(root, text="选择生成图表类型")
+#         self.output_button.pack(pady=10)
+#
+#         self.chart_type_var = StringVar(value='scatter')
+#         self.scatter_radio = Radiobutton(root, text="散点图", variable=self.chart_type_var, value='scatter')
+#         self.scatter_radio.pack(pady=5)
+#         self.line_radio = Radiobutton(root, text="折线图", variable=self.chart_type_var, value='line')
+#         self.line_radio.pack(pady=5)
+#         self.bar_radio = Radiobutton(root, text="柱状图", variable=self.chart_type_var, value='bar')
+#         self.bar_radio.pack(pady=5)
+#
+#         self.generate_button = Button(root, text="分析数据", command=self.generate_chart)
+#         self.generate_button.pack(pady=20)
+#
+#         # 输入NMEA报文的文本框和按钮
+#         self.nmea_label = Label(root, text="输入nmea报文（每条以回车分隔）")
+#         self.nmea_label.pack(pady=10)
+#
+#         self.nmea_input = Text(root, height=10, width=20)
+#         self.nmea_input.pack(pady=10)
+#
+#         self.nmea_button = Button(root, text="解析nmea报文", command=self.parse_nmea_input)
+#         self.nmea_button.pack(pady=10)
+#
+#     def show_succ(self, message):
+#         succ_window = Toplevel(self.root)
+#         succ_window.title("完成")
+#         Label(succ_window, text=message, fg="blue").pack(pady=20)
+#         Button(succ_window, text="确定", command=succ_window.destroy).pack(pady=5)
+#
+#     def show_error(self, message):
+#         error_window = Toplevel(self.root)
+#         error_window.title("错误")
+#         Label(error_window, text=message, fg="red").pack(pady=20)
+#         Button(error_window, text="关闭", command=error_window.destroy).pack(pady=5)
+#
+#     def select_input_path(self):
+#         self.input_dir = filedialog.askdirectory(title="选择待nmea日志输入的文件路径")
+#
+#     def select_output_path(self):
+#         self.output_dir = filedialog.askdirectory(title="选择分析结果输出的文件路径")
+#
+#     # 解析用户输入的nmea报文
+#     def parse_nmea_input(self):
+#         nmea_data = self.nmea_input.get("1.0", END).strip()
+#         if not nmea_data:
+#             messagebox.showerror("错误", "请输入nmea报文")
+#             return
+#
+#         # 将每行nmea报文解析并显示在文本框内
+#         nmea_lines = nmea_data.split('\n')
+#
+#         nmeasingle.prase_nmea(nmea_lines)
+#
+#         self.show_succ("解析完成！")
+#
+#     def generate_chart(self):
+#         if self.input_dir and self.output_dir:
+#             try:
+#                 start_time = int(datetime.strftime(self.start_data_entry.get(), "%Y-%m-%d %H:%M:%S").timestamp())
+#                 end_time = int(datetime.strftime(self.end_data_entry.get(), "%Y-%m-%d %H:%M:%S").timestamp())
+#                 if start_time < end_time:
+#                     parse_nmea_log(start_time, end_time, self.input_dir, self.output_dir, self.chart_type_var.get())
+#                 else:
+#                     self.show_error("请确保开始时间和结束时间正确！")
+#             except ValueError:
+#                 self.show_error("无效的时间格式！请确保格式为 'YYYY-MM-DD HH:MM:SS'. ")
+#                 return
+#         else:
+#             self.show_error("请确保输入有效的输入/输出文件路径")
+#
+
+
 class NMEAParserApp:
     def __init__(self, root):
         self.root = root
         self.root.title('NMEA Parser')
-        self.root.geometry('1000x1000')
+        self.root.geometry('1000x800')
 
         self.input_dir = None
         self.output_dir = None
 
-        # Tkinter GUI 日期时间选择
-        self.start_data_label = Label(root, text='选择nmea日志分析的开始时间(YYYY-MM-DD HH:MM:SS)')
-        self.start_data_label.pack(pady=5)
-        self.start_data_entry = Entry(root) # 允许手动输入
-        self.start_data_entry.pack(pady=5)
+        # 设置主题样式
+        self.style = ttk.Style()
+        self.style.theme_use("flatly")
 
-        self.end_data_label = Label(root, text="选择nmea日志分析的结束时间(YYYY-MM-DD HH:MM:SS)")
-        self.end_data_label.pack(pady=5)
-        self.end_data_entry = Entry(root) # 允许手动输入
-        self.end_data_entry.pack(pady=5)
+        # 日期时间选择
+        self.start_data_label = ttk.Label(root, text='选择nmea日志分析的开始时间(YYYY-MM-DD HH:MM:SS)')
+        self.start_data_label.pack(pady=10)
+        self.start_data_entry = ttk.Entry(root)  # 允许手动输入
+        self.start_data_entry.pack(pady=10, padx=20)
+
+        self.end_data_label = ttk.Label(root, text="选择nmea日志分析的结束时间(YYYY-MM-DD HH:MM:SS)")
+        self.end_data_label.pack(pady=10)
+        self.end_data_entry = ttk.Entry(root)  # 允许手动输入
+        self.end_data_entry.pack(pady=10, padx=20)
 
         # 文件路径选择按钮
-        self.input_button = Button(root, text="选择nmea日志文件路径", command=self.select_input_path)
-        self.input_button.pack(pady=10)
+        self.input_button = ttk.Button(root, text="选择nmea日志文件路径", bootstyle="primary", command=self.select_input_path)
+        self.input_button.pack(pady=15)
 
-        self.output_button = Button(root, text="选择分析结果输出路径", command=self.select_output_path)
-        self.output_button.pack(pady=10)
+        self.output_button = ttk.Button(root, text="选择分析结果输出路径", bootstyle="primary", command=self.select_output_path)
+        self.output_button.pack(pady=15)
 
-        self.output_button = Label(root, text="选择生成图表类型")
-        self.output_button.pack(pady=10)
+        # 选择图表类型
+        self.chart_type_label = ttk.Label(root, text="选择生成图表类型")
+        self.chart_type_label.pack(pady=10)
 
         self.chart_type_var = StringVar(value='scatter')
-        self.scatter_radio = Radiobutton(root, text="散点图", variable=self.chart_type_var, value='scatter')
+        self.scatter_radio = ttk.Radiobutton(root, text="散点图", variable=self.chart_type_var, value='scatter')
         self.scatter_radio.pack(pady=5)
-        self.line_radio = Radiobutton(root, text="折线图", variable=self.chart_type_var, value='line')
+
+        self.line_radio = ttk.Radiobutton(root, text="折线图", variable=self.chart_type_var, value='line')
         self.line_radio.pack(pady=5)
-        self.bar_radio = Radiobutton(root, text="柱状图", variable=self.chart_type_var, value='bar')
+
+        self.bar_radio = ttk.Radiobutton(root, text="柱状图", variable=self.chart_type_var, value='bar')
         self.bar_radio.pack(pady=5)
 
-        self.generate_button = Button(root, text="分析数据", command=self.generate_chart)
-        self.generate_button.pack(pady=20)
+        # 生成图表按钮
+        self.generate_button = ttk.Button(root, text="分析数据", bootstyle="success", command=self.generate_chart)
+        self.generate_button.pack(pady=30)
 
         # 输入NMEA报文的文本框和按钮
-        self.nmea_label = Label(root, text="输入nmea报文（每条以回车分隔）")
-        self.nmea_label.pack(pady=10)
+        self.nmea_label = ttk.Label(root, text="输入nmea报文（每条以回车分隔）")
+        self.nmea_label.pack(pady=15)
 
-        self.nmea_input = Text(root, height=10, width=20)
-        self.nmea_input.pack(pady=10)
+        self.nmea_input = ttk.Text(root, height=10, width=40)
+        self.nmea_input.pack(pady=15)
 
-        self.nmea_button = Button(root, text="解析nmea报文", command=self.parse_nmea_input)
-        self.nmea_button.pack(pady=10)
+        self.nmea_button = ttk.Button(root, text="解析nmea报文", bootstyle="info", command=self.parse_nmea_input)
+        self.nmea_button.pack(pady=15)
 
     def show_succ(self, message):
         succ_window = Toplevel(self.root)
         succ_window.title("完成")
-        Label(succ_window, text=message, fg="blue").pack(pady=20)
-        Button(succ_window, text="确定", command=succ_window.destroy).pack(pady=5)
+        ttk.Label(succ_window, text=message, foreground="blue").pack(pady=20)
+        ttk.Button(succ_window, text="确定", bootstyle="secondary", command=succ_window.destroy).pack(pady=5)
 
     def show_error(self, message):
         error_window = Toplevel(self.root)
         error_window.title("错误")
-        Label(error_window, text=message, fg="red").pack(pady=20)
-        Button(error_window, text="关闭", command=error_window.destroy).pack(pady=5)
+        ttk.Label(error_window, text=message, foreground="red").pack(pady=20)
+        ttk.Button(error_window, text="关闭", bootstyle="secondary", command=error_window.destroy).pack(pady=5)
 
     def select_input_path(self):
         self.input_dir = filedialog.askdirectory(title="选择待nmea日志输入的文件路径")
@@ -251,16 +364,14 @@ class NMEAParserApp:
     def select_output_path(self):
         self.output_dir = filedialog.askdirectory(title="选择分析结果输出的文件路径")
 
-    # 解析用户输入的nmea报文
     def parse_nmea_input(self):
-        nmea_data = self.nmea_input.get("1.0", END).strip()
+        nmea_data = self.nmea_input.get("1.0", "end-1c").strip()
         if not nmea_data:
             messagebox.showerror("错误", "请输入nmea报文")
             return
 
-        # 将每行nmea报文解析并显示在文本框内
+        # 解析nmea报文
         nmea_lines = nmea_data.split('\n')
-
         nmeasingle.prase_nmea(nmea_lines)
 
         self.show_succ("解析完成！")
@@ -268,10 +379,11 @@ class NMEAParserApp:
     def generate_chart(self):
         if self.input_dir and self.output_dir:
             try:
-                start_time = int(datetime.strftime(self.start_data_entry.get(), "%Y-%m-%d %H:%M:%S").timestamp())
-                end_time = int(datetime.strftime(self.end_data_entry.get(), "%Y-%m-%d %H:%M:%S").timestamp())
+                start_time = int(datetime.datetime.strptime(self.start_data_entry.get(), "%Y-%m-%d %H:%M:%S").timestamp())
+                end_time = int(datetime.datetime.strptime(self.end_data_entry.get(), "%Y-%m-%d %H:%M:%S").timestamp())
                 if start_time < end_time:
                     parse_nmea_log(start_time, end_time, self.input_dir, self.output_dir, self.chart_type_var.get())
+                    self.show_succ("分析成功！")
                 else:
                     self.show_error("请确保开始时间和结束时间正确！")
             except ValueError:
@@ -286,6 +398,7 @@ if __name__ == "__main__":
     # start_time = 1730341980  # 开始时间戳  2024-11-11 11:10  2024-11-05 19:40 2024-11-05 19:47  2024-11-05 19:41:48 2024-11-11 11:40 2024-10-31 10:33
     # end_time = 1730342100  # 结束时间戳 2024-11-11 11:20  2024-11-05 20:00 2024-11-05 19:49  2024-11-05 19:48:43 2024-11-11 11:42 2024-10-31 10:35
     # parse_nmea_log(start_time, end_time)
-    root = Tk()
+    # root = Tk()
+    root = ttk.Window(themename="flatly")
     app = NMEAParserApp(root)
     root.mainloop()
