@@ -69,6 +69,9 @@ def prase_nmea(sentence):
             latitude = convert_to_decimal(parts[2]) if parts[3] == 'N' else -convert_to_decimal(parts[2])
             longitude = convert_to_decimal(parts[4]) if parts[5] == 'E' else -convert_to_decimal(parts[4])
 
+            if longitude > 360:
+                longitude = longitude - 360
+
             parsed_data['GGA'] = {
                 'time': parts[1],
                 'timestamp': timestamp,
@@ -94,6 +97,9 @@ def prase_nmea(sentence):
             timestamp, bj_time = conver_time_to_timestamp_and_bj(parts[1])
             latitude = convert_to_decimal(parts[3]) if parts[4] == 'N' else -convert_to_decimal(parts[3])
             longitude = convert_to_decimal(parts[5]) if parts[6] == 'E' else -convert_to_decimal(parts[5])
+
+            if longitude > 360:
+                longitude = longitude - 360
 
             parsed_data['RMC'] = {
                 'time': parts[1],
@@ -137,6 +143,9 @@ def prase_nmea(sentence):
             timestamp, bj_time = conver_time_to_timestamp_and_bj(parts[1])
             latitude = convert_to_decimal(parts[2]) if parts[3] == 'N' else -convert_to_decimal(parts[2])
             longitude = convert_to_decimal(parts[4]) if parts[5] == 'E' else -convert_to_decimal(parts[4])
+
+            if longitude > 360:
+                longitude = longitude - 360
 
             parsed_data['GNS'] = {
                 'time': parts[1],
