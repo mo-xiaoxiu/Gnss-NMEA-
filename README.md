@@ -84,6 +84,19 @@ time=时间戳
 * 选择nmea日志文件路径：点击之后选择本地文件名前缀为`nmea.log`的日志文件
 * 选择分析结果输出路径：点击之后选择输出物所在的本地文件路径
 * 选择生成图表类型：默认为`散点图`，还可以选择`折线图`，`柱状图`，用于分析`nmea.log`中分析时间段内的可视卫星的SNR分布情况
+
+*散点图示例*
+
+![](https://myblog-1308923350.cos.ap-guangzhou.myqcloud.com/img/微信图片_20241223131647.png)
+
+*折线图示例*
+
+![](https://myblog-1308923350.cos.ap-guangzhou.myqcloud.com/img/微信图片_20241223131642.png)
+
+*柱状图示例*
+
+![](https://myblog-1308923350.cos.ap-guangzhou.myqcloud.com/img/微信图片_20241223131630.png)
+
 * 输入nmea报文（每条以回车分隔）：此为单独分析数据模块，为了分析没有带时间戳的单条或者以换行符分割的多条nmea数据
   * 在下面空白框输入nmea原始报文后点击下方`解析nmea报文`，即可在当前工程所在文件目录下生成`nmeaParse_single`的excel数据表格和用于`图新地图`软件打点的`txt`文件
   * 演示如下：

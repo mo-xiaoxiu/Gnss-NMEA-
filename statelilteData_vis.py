@@ -94,5 +94,5 @@ def stateliltes_data_vis(stateliltes_data_vis_excel, show_flag='scatter'):
 
 
 # 本地测试
-if __name__ == "main":
+if __name__ == "__main__":
     stateliltes_data_vis("D:/project/satellites_data_2024-11-07_04-17_2024-11-07_04-18.xlsx", 'bar')
