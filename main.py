@@ -13,6 +13,10 @@ from tkcalendar import Calendar  # 用于日期选择控件
 import pyautogui
 import numpy as np
 
+import tkinter as tk
+from tkinter import ttk
+from PIL import Image, ImageTk
+
 import ttkbootstrap as ttk
 # from ttkbootstrap import Messagebox
 
@@ -291,7 +295,13 @@ class NMEAParserApp:
     def __init__(self, root):
         self.root = root
         self.root.title('NMEA Parser')
-        self.root.geometry('1000x800')
+        self.root.geometry('800x1500')
+
+        self.logo = ImageTk.PhotoImage(Image.open("./logo/NMEAParser.png"))  # 替换为你的logo路径
+        self.logo_label = ttk.Label(root, image=self.logo)
+        self.logo_label.image = self.logo  # 保持对图片的引用
+        self.logo_label.pack(pady=20)  # 调整位置和间距
+        self.root.iconbitmap('./logo/NMEAParser_ico.ico')
 
         self.input_dir = None
         self.output_dir = None

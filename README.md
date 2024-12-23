@@ -1,4 +1,16 @@
-# Gnss-NMEA数据处理使用指南
+# Gnss-NMEAParser数据处理使用指南
+
+
+<div align="center">
+    <img src="https://myblog-1308923350.cos.ap-guangzhou.myqcloud.com/img/330x330.png" >
+</div>
+
+
+
+
+
+
+
 ## 目的
 
 通过输入定位有问题的时间区间的nmea原始语句，解析出经纬度等定位信息，导出可供打点的数据格式，进行数据打点来观测问题时间点是否有定位偏移等情况
